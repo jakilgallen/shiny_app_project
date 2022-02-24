@@ -20,6 +20,8 @@ library(sp)
 library(plotly)
 library(shinydashboard)
 library(DT)
+library(rnaturalearth)
+library(sp)
 
 
 
