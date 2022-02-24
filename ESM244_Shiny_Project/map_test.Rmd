@@ -37,6 +37,8 @@ library(rAmCharts)
 library(rsconnect)
 library(shinydashboard)
 library(DT)
+library(rnaturalearth)
+library(sp)
 
 # Read in the data
 gender_data <- read_xlsx(here("data", "Gender.xlsx"))
@@ -92,56 +94,86 @@ map_data <- map_data %>% slice(-c(193, 200:222))
 ## need to drop some more--- 
 map_data <- map_data %>% slice(-c(63, 118, 156))
 ## now putting in alphabetical order
-map_data <- map_data %>% arrange(country) %>% 
-  rename(
-    region = country
-  )
-## using base map data from ggplot to try to assemble em
-base_map <- map_data("world")
-base_map <- left_join(base_map, map_data, by = "region")
+map_data <- map_data %>% arrange(country) 
 
-## now taking rid of the nas so only have country with data
-basemap1 <- base_map %>% filter(!is.na(base_map$gender_equality_index_18))
-## ok this worked but have too many lat and long measures for each country need to somehow get one for each
+## using rnatural earth to make an interactive map, hopefully
+map <- ne_countries()
+names(map)[names(map) == "iso_a3"] <- "ISO3"
+names(map)[names(map) == "name"] <- "country"
 
-## going to see if I can summarize to just get mean score
-basemap2 <- basemap1 %>% 
-  group_by(region) %>% 
-  summarize(hdi_rank, gender_equality_index_18, long, lat, rank_18, 
-            maternal_mortality_ratio_15, adolescent_birth_rate_15_20, seats_in_parliment_18,
-            secondary_education_m_10_18,
-            secondary_education_f_10_18,
-            labour_force_participation_f_18,
-            labour_force_participation_m_18)
-## ok this just rebuilt the same thing, need to some how just get one measure of lat and long for each country to set with data point
+head(map)
 
+# base plot of map
+plot(map)
 
+map_merged <- merge(x = map, y = map_data, by = "country", all.x = TRUE)
 
+class(map_merged)
+
+map_merged$gender_equality_index_18 <- as.numeric(map_merged$gender_equality_index_18)
+
+  
 ## trying to create map with leaflet
-leaflet(options = leafletOptions(attributionControl = FALSE)) %>% 
-  addProviderTiles(providers$OpenStreetMap) %>% 
-  addScaleBar(position = "bottomleft") 
+  
+## first going to make a palette based on the GE index
+pal <- colorBin(
+  palette = "viridis", domain = map_merged$gender_equality_index_18,
+  bins = seq(0, max(map_merged$gender_equality_index_18, na.rm = TRUE) + .1, by = .1)
+)
 
+map_merged$labels <- paste0(
+  "<strong> Country: </strong> ",
+  map_merged$country, "<br/> ",
+  "<strong> Gender Equality Index: </strong> ",
+  map_merged$gender_equality_index_18, "<br/> "
+) %>%
+  lapply(htmltools::HTML)
 
+leaflet(map_merged) %>%
+  addTiles() %>%
+  setView(lng = 0, lat = 30, zoom = 2) %>%
+  addPolygons(
+    fillColor = ~ pal(gender_equality_index_18),
+    color = "white",
+    fillOpacity = 0.7,
+    label = ~labels,
+    highlight = highlightOptions(
+      color = "black",
+      bringToFront = TRUE
+    )
+  ) %>%
+  leaflet::addLegend(
+    pal = pal, values = ~gender_equality_index_18,
+    opacity = 0.7, title = "Gender Equality Index"
+  )
 
 
 ```
 
 
 
+
+
+
+
+
+
+
+
+
 ### useful old code
 ```{r}
 ## attempt at interactive map using ggplot
-map1 <- ggplot(basemap1, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = gender_equality_index_18), color = "black")
-
-map2 <- map1 + 
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.position = "none")
-map2
+# map1 <- ggplot(basemap1, aes(x = long, y = lat, group = group)) +
+#   geom_polygon(aes(fill = gender_equality_index_18), color = "black")
+# 
+# map2 <- map1 + 
+#   theme(axis.text.x = element_blank(),
+#         axis.text.y = element_blank(),
+#         axis.title.x = element_blank(),
+#         axis.title.y = element_blank(),
+#         legend.position = "none")
+# map2
 ```
 
 

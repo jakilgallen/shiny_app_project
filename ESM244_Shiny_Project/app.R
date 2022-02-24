@@ -73,6 +73,8 @@ tab_data_table <- tab_data %>%
 tab_data_table$Status <- NULL
 
 ## creating a subset of the data to use to make a map
+## MAKING INTERACTIVE MAP
+## creating a subset of the data to use to make a map
 map_data <- gender_mod %>% 
   janitor::clean_names()
 ## dropping rows that do not contain countries
@@ -80,23 +82,25 @@ map_data <- map_data %>% slice(-c(193, 200:222))
 ## need to drop some more--- 
 map_data <- map_data %>% slice(-c(63, 118, 156))
 ## now putting in alphabetical order
-map_data <- map_data %>% arrange(country) %>% 
-  rename(
-    region = country
-  )
+map_data <- map_data %>% arrange(country) 
+
+## using rnatural earth to make an interactive map, hopefully
+map <- ne_countries()
+names(map)[names(map) == "iso_a3"] <- "ISO3"
+names(map)[names(map) == "name"] <- "country"
+
+head(map)
+
+# merging the data with our gender data
+map_merged <- merge(x = map, y = map_data, by = "country", all.x = TRUE)
+## changing indicators to class numeric so can add them to the polygons
+map_merged$gender_equality_index_18 <- as.numeric(map_merged$gender_equality_index_18)
+
 
 # slider map
 map_data$gender_equality_index_18 <- as.numeric(map_data$gender_equality_index_18)
 
-## using base map data from ggplot to try to assemble em
-base_map <- map_data("world")
-base_map <- left_join(base_map, map_data, by = "region")
 
-## now taking rid of the nas so only have country with data
-basemap1 <- base_map %>% filter(!is.na(base_map$gender_equality_index_18))
-
-map1 <- ggplot(basemap1, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = gender_equality_index_18), color = "black")
 
 
 ## Dashboard
@@ -119,7 +123,9 @@ body <- dashboardBody(
     tabItem(tabName = "home",
             fluidRow(
               box(title = "Status of Gender Equality Globally",
-                  h1('summary'),
+                  status = "primary",
+                  solidHeader = TRUE,
+                  h1('Overview'),
                   p("While Gender Equality has been identified as a critical global goal by the UN and various multinational organizations, 
                       Gender Equality remains far from realized.The purpose of this application is to increase awareness of the current state of 
                       gender equality globally (i.e. across regions and countries) to increase awareness, give individuals resources to become changemakers in their own communities,
@@ -127,23 +133,28 @@ body <- dashboardBody(
             ), # end fluid row "home"
             fluidPage(
               mainPanel(     
-                img(src = "gender-page_v-08.jpeg", height = 350, width = 350)
+                img(src = "gender-page_v-08.jpeg", height = 450, width = 350)
               ))),
     tabItem(tabName = "stats",
             fluidRow(
               box(title = "Statistics by World Region", 
+                  status = "warning",
+                  solidHeader = TRUE,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
-                  DTOutput('table'))
+                  DTOutput('table', height = 250, width = 250))
             )),
     tabItem(tabName = "map",
             fluidRow(
-              box(title = "Interactive world map",
-                  h1('look at this interactive world map its so cool'),
-                  p("wow can it be real, play with the map be amazed"))
+              box(title = "Gender Equality Measures Mapped",
+                  status = "primary",
+                  solidHeader = TRUE,
+                  h1('Interactive World Map of Gender Equality Outcomes'),
+                  p("Click on individual countries to get information country level information on different gender equality indicators.
+                    This includes XXX"))
             ), # end fluid row
             fluidPage( ## building output for map
-              leafletOutput("joemap"),
+              leafletOutput(outputId = "joemap", height = 400, width = 700),
               p(),
               actionButton("recalc", "New points")
             ) # end fluidpage
@@ -217,15 +228,53 @@ server <- function(input, output) {
   ### start server function
   
   ## function for data table
-  output$table <- renderDT({
+  output$table <- renderDT({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
     tab_data_table
   })
   
-  ## function for interactive map
+# function for interactive map
+  ######first creating palette by ge index
+  pal <- colorBin(
+    palette = "viridis", domain = map_merged$gender_equality_index_18,
+    bins = seq(0, max(map_merged$gender_equality_index_18, na.rm = TRUE) + .1, by = .1)
+  )
+  ###adding labels
+  map_merged$labels <- paste0(
+    "<strong> Country: </strong> ",
+    map_merged$country, "<br/> ",
+    "<strong> Gender Equality Index: </strong> ",
+    map_merged$gender_equality_index_18, "<br/> ",
+    "<strong> Maternal Mortality Ratio: </strong> ",
+    map_merged$maternal_mortality_ratio_15, "<br/> ",
+    "<strong> Female Labour Force Participation: </strong> ",
+    map_merged$labour_force_participation_f_18, "<br/> ",
+    "<strong> Female Secondary Education: </strong> ",
+    map_merged$secondary_education_f_10_18, "<br/> ",
+    "<strong> Number of Female Seats in Parliament: </strong> ",
+    map_merged$seats_in_parliment_18, "<br/> "
+  ) %>%
+    lapply(htmltools::HTML)
+## output of joemap interactive 
   output$joemap <- renderLeaflet({
-    leaflet(options = leafletOptions(attributionControl = FALSE)) %>% 
-      addProviderTiles(providers$OpenStreetMap) %>% 
-      addScaleBar(position = "bottomleft") 
+    leaflet(map_merged) %>%
+      addTiles() %>%
+      setView(lng = 0, lat = 30, zoom = 1.25) %>%
+      addPolygons(
+        fillColor = ~ pal(gender_equality_index_18),
+        color = "white",
+        fillOpacity = 0.7,
+        label = ~labels,
+        highlight = highlightOptions(
+          color = "black",
+          bringToFront = TRUE
+        )
+      ) %>%
+      leaflet::addLegend(
+        pal = pal, values = ~gender_equality_index_18,
+        opacity = 0.7, title = "Gender Equality Index"
+      ) #%>% 
+      # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
+      #   addScaleBar(position = "bottomleft") 
   })
   
   #### Scatter Plot ### 
@@ -288,12 +337,6 @@ server <- function(input, output) {
   })
   
   output$df <- renderTable({filter_range()})
-  ## function for interactive map
-  output$joemap <- renderLeaflet({
-    leaflet(options = leafletOptions(attributionControl = FALSE)) %>% 
-      addProviderTiles(providers$OpenStreetMap) %>% 
-      addScaleBar(position = "bottomleft") 
-  })
 }
 
 ### combine into an app:
