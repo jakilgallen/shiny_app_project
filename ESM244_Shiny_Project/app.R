@@ -100,11 +100,12 @@ map1 <- ggplot(basemap1, aes(x = long, y = lat, group = group)) +
 
 
 ## Dashboard
-header <- dashboardHeader(title = "Gender Equality")
+header <- dashboardHeader(title = "Understanding the State of Gender Equality Globally",
+                          titleWidth = 450)
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("Home", tabName = "home"),
+    menuItem("Home", tabName = "home", icon = icon("dashboard")),
     menuItem("Statistics by Region", tabName = "stats"),
     menuItem("Interactive Map", tabName = "map"),
     menuItem("Slider of GE Index", tabName = "slider"),
