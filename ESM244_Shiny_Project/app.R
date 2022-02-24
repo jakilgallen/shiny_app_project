@@ -125,7 +125,8 @@ body <- dashboardBody(
               box(title = "Status of Gender Equality Globally",
                   status = "primary",
                   solidHeader = TRUE,
-                  h1('Overview'),
+                  width = 15,
+                  h1('Overview:'),
                   p("While Gender Equality has been identified as a critical global goal by the UN and various multinational organizations, 
                       Gender Equality remains far from realized.The purpose of this application is to increase awareness of the current state of 
                       gender equality globally (i.e. across regions and countries) to increase awareness, give individuals resources to become changemakers in their own communities,
@@ -138,25 +139,25 @@ body <- dashboardBody(
     tabItem(tabName = "stats",
             fluidRow(
               box(title = "Statistics by World Region", 
-                  status = "warning",
+                  status = "primary",
                   solidHeader = TRUE,
+                  width = 20,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
                   DTOutput('table', height = 250, width = 250))
             )),
     tabItem(tabName = "map",
             fluidRow(
-              box(title = "Gender Equality Measures Mapped",
+              box(title = "World Map of Gender Equality Indicators",
                   status = "primary",
                   solidHeader = TRUE,
-                  h1('Interactive World Map of Gender Equality Outcomes'),
-                  p("Click on individual countries to get information country level information on different gender equality indicators.
+                  width = 20,
+                  p("Hover over individual countries to get information country level information on different gender equality indicators.
                     This includes XXX"))
             ), # end fluid row
             fluidPage( ## building output for map
               leafletOutput(outputId = "joemap", height = 400, width = 700),
-              p(),
-              actionButton("recalc", "New points")
+              p()
             ) # end fluidpage
     ),
     tabItem(tabName = "slider",
@@ -172,6 +173,9 @@ body <- dashboardBody(
     tabItem(tabName = "scatterplot",
             fluidRow(
               box(title = "Scatterplot on Gender Equality outcomes and predictors",
+                  status = "primary",
+                  solidHeader = TRUE,
+                  width = 20,
                   h1("by outcome measure and predictors"),
                   p("alter this interactive plot to see how it affects outputs"))
             ),
@@ -187,6 +191,9 @@ body <- dashboardBody(
     tabItem(tabName = "involved",
             fluidRow(
               box(title = "Get Informed & Involved",
+                  status = "primary",
+                  solidHeader = TRUE,
+                  width = 20,
                   h1("Gender Equality in the News"),
                   p("New York Times- 'Across The Globe, a Serious Backlash Against Women's Rights' 
                                    --https://www.nytimes.com/2019/12/04/us/domestic-violence-international.html",
