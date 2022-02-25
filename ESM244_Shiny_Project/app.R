@@ -197,20 +197,25 @@ body <- dashboardBody(
                   solidHeader = TRUE,
                   width = 20,
                   h1("Gender Equality in the News"),
-                  p("New York Times- 'Across The Globe, a Serious Backlash Against Women's Rights' 
-                                   --https://www.nytimes.com/2019/12/04/us/domestic-violence-international.html",
-                    
-                    "'BBC-- 'Gender study finds 90% of people are biased against women' ----- https://www.bbc.com/news/world-51751915",
-                    ""),
+                  tags$a(href = "https://www.nytimes.com/2019/12/04/us/domestic-violence-international.html", "New York Times- 'Across The Globe, a Serious Backlash Against Women's Rights"),
+                  p(" "),
+                  tags$a(href = "https://www.bbc.com/news/world-51751915", "'BBC-- 'Gender study finds 90% of people are biased against women",
+                  ),
                   h2("Get Involved"),
-                  p("See list of ongoing interventions and ways to get involved",
-                    "Promundo--- https://promundoglobal.org/work/",
-                    "Men Engage--- https://menengage.org/",
-                    "Techno Serve--- https://www.technoserve.org/what-we-do/women/?post_type=project",
-                    "Global Giving---- https://www.globalgiving.org/search/?size=25&nextPage=1&sortField=sortorder&selectedThemes=gender&loadAllResults=true",
-                    "Women Voice Network--- https://womenvoicenetwork.com/?gclid=CjwKCAiA6seQBhAfEiwAvPqu15TX_8nrpABjwIieQdyJgTCRgwCC42rOqrwOa0OMwL_3iHk4PXtJnhoCe24QAvD_BwE",
-                    "Women for Women International--- https://www.womenforwomen.org/why-women?src=GGEV222A&ms=cpc_google_awarness&utm_medium=cpc&utm_source=google&utm_campaign=awarness&utm_content=gg+ad&gclid=CjwKCAiA6seQBhAfEiwAvPqu15YD5SrFnaJz-3sM3iKAcftHXb8qZJyfFvTu5r889wcdBEAYa4STQhoC7nwQAvD_BwE"))
-            )
+                  p("See list of ongoing interventions and ways to get involved"),
+                  tags$a(href = "https://promundoglobal.org/work/", "Promundo"),
+                  p(" "),
+                  tags$a(href = "https://menengage.org/", "Men Engage"),
+                  p(" "),
+                  tags$a(href = "https://www.technoserve.org/what-we-do/women/?post_type=project", "Techno Serve"),
+                  p(" "),
+                  tags$a(href = "https://www.globalgiving.org/search/?size=25&nextPage=1&sortField=sortorder&selectedThemes=gender&loadAllResults=true", "Global Giving"),
+                  p(" "),
+                  tags$a(href = "https://womenvoicenetwork.com/?gclid=CjwKCAiA6seQBhAfEiwAvPqu15TX_8nrpABjwIieQdyJgTCRgwCC42rOqrwOa0OMwL_3iHk4PXtJnhoCe24QAvD_BwE", "Women Voice Network"),
+                  p(" "),
+                  tags$a(href = "https://www.womenforwomen.org/why-women?src=GGEV222A&ms=cpc_google_awarness&utm_medium=cpc&utm_source=google&utm_campaign=awarness&utm_content=gg+ad&gclid=CjwKCAiA6seQBhAfEiwAvPqu15YD5SrFnaJz-3sM3iKAcftHXb8qZJyfFvTu5r889wcdBEAYa4STQhoC7nwQAvD_BwE", "Women for Women International")
+            ))
+            
     )
     
   ) # end tabItems
