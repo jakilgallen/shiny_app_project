@@ -157,7 +157,9 @@ body <- dashboardBody(
                   width = 20,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
-                  tableOutput('table'))
+                  selectInput("incountry", "Select a Country", choices = tab_data_table$country)
+                  ), # end box1 stats
+              box(tableOutput('table'))
             )),
     tabItem(tabName = "map",
             fluidRow(
