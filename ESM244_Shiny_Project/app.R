@@ -141,8 +141,8 @@ sidebar <- dashboardSidebar(
     menuItem("Statistics by Region", tabName = "stats"),
     menuItem("Slider of GE Index", tabName = "slider"),
     menuItem("Scatter Plot", tabName = "scatterplot"),
-    menuItem("Get Informed & Involved", tabName = "involved" ),
-    menuItem("Model Your Own Data", tabName = "self_model")
+    menuItem("Model Your Own Data", tabName = "self_model"),
+    menuItem("Get Informed & Involved", tabName = "involved")
   )
 )
 
