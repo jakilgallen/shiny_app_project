@@ -242,13 +242,14 @@ body <- dashboardBody(
             
     ),
     tabItem(tabName = "self_model",
+            fluidRow(box(plotOutput("explore_plot")), box(plotOutput("model_plot")),
             box(fileInput("v_fileinput", label = "Upload File"),
                 uiOutput("target_var"),
                 actionButton("v_button", "Run Model"),
                 textInput("v_filename", label = "Filename", value = "model_results.csv", placeholder = "model_results.csv"),
                 downloadButton("v_download", "Download Summary")
-            ),
-            fluidRow(box(plotOutput("explore_plot")), box(plotOutput("model_plot"))
+            )
+            
                      ) # end fluidRow
             ) # end tabName self_model
     
@@ -323,7 +324,8 @@ server <- function(input, output) {
       ) %>%
       leaflet::addLegend(
         pal = pal, values = ~gender_equality_index_18,
-        opacity = 0.7, title = "Gender Equality Index"
+        opacity = 0.7, title = "Gender Equality Index",
+        position = "bottomleft"
       ) #%>% 
       # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
       #   addScaleBar(position = "bottomleft") 
