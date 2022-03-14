@@ -79,13 +79,23 @@ tab_data_table <- tab_data_table %>%
   mutate_at(c(3:11), as.numeric) %>% 
   drop_na()
 
-class(tab_data_table$gender_equality_index_18)
-
 tab_data_table %>% 
-  mutate(across(is.numeric, round, digits = 2)) %>% 
-  select(!rank_18)
+  mutate(across(is.numeric, round, digits = 2)) 
+
+## changing names to make table look better
+names(tab_data_table)[1] <- "Country"
+names(tab_data_table)[2] <- "Human Development Index Rank"
 names(tab_data_table)[3] <- "Gender Equality Index"
-names(tab_data_table)[4] <- "Maternal Mortality Ratio"
+names(tab_data_table)[3] <- "Gender Equality Index"
+names(tab_data_table)[4] <- "Country Rank"
+names(tab_data_table)[5] <- "Maternal Mortality Ratio"
+names(tab_data_table)[6] <- "Adolescent Birth Rate"
+names(tab_data_table)[7] <- "Seats in Parliament"
+names(tab_data_table)[8] <- "% of Women with Secondary Education"
+names(tab_data_table)[9] <- "% of Men with Secondary Education"
+names(tab_data_table)[10] <- "% of Female Labour Force Participation"
+names(tab_data_table)[11] <- "% of Male Labour Force Participation"
+
 
 
 tab_data_table$Status <- NULL
@@ -163,7 +173,7 @@ body <- dashboardBody(
                   width = 20,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
-                  selectInput("incountry", "Select a Country", choices = tab_data_table$country)
+                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country, selected = NULL, multiple = TRUE)
                   ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
@@ -277,7 +287,7 @@ server <- function(input, output) {
   output$table <- renderDataTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
     # countryfilter <- subset(tab_data_table, tab_data_table$country == input$incountry)
     tab_data_table %>% 
-      filter(country == input$incountry) 
+      filter(Country == input$incountry) 
   })
   
 # function for interactive map
