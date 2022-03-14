@@ -203,14 +203,21 @@ body <- dashboardBody(
                   solidHeader = TRUE,
                   width = 20,
                   h1("by outcome measure and predictors"),
-                  p("alter this interactive plot to see how it affects outputs"))
-            ),
-            plotOutput("plot1",
-                       click = "plot_click",
-                       dblclick = "plot_dblclick",
-                       hover = "plot_hover",
-                       brush = "plot_brush",
-                       inline = FALSE
+                  p("alter this interactive plot to see how it affects outputs"),
+                  selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
+                              selected = "HDI Rank"),
+                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank '18", "Maternal Mortality Ratio '15", 
+                                                                         "Adolescent Birth Rate '15-'20", "Seats in Parliment '18"), multiple = TRUE,
+                
+                              selected = "HDI Rank")), # box 1 scatterplot
+              box(plotOutput("plot1",
+                             click = "plot_click",
+                             dblclick = "plot_dblclick",
+                             hover = "plot_hover",
+                             brush = "plot_brush",
+                             inline = FALSE
+            ) # box 2 scatterplot
+            
             ),
             verbatimTextOutput("info") 
     ), # end scatter plot),
@@ -332,28 +339,45 @@ server <- function(input, output) {
   })
   
   #### Scatter Plot ### 
-  output$plot1 <- renderPlot({
-    plot(gender_mod$`Rank '18`, gender_mod$`HDI Rank`)
+  df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
+  
+ 
+  # Create the plot
+  # output$plot1 <- renderPlot({plot(df2(), pch = 20, cex = 3, col = "blue",
+  #                                 main = "Interactive Scatter Plot")})
+  # 
+output$plot1 <- renderPlot({
+  plot1_df <- ggplot(df2[df2$], aes(x = year, y = Concede_and_Divide_Revenue, color = HmTm)) + 
+  geom_point() + xlab("Year") + ylab("Concede-and-Divide Allocation") + 
+  ggtitle("Concede-and-Divide Rule Allocation 1998-2019") + 
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+  
+})
+  
   })
   
-  output$info <- renderText({
-    xy_str <- function(e) {
-      if(is.null(e)) return("NULL\n")
-      paste0(x=2, round(e$x, 1), y=4, round(e$y, 1), "\n")
-    }
-    xy_range_str <- function(e) {
-      if(is.null(e)) return("NULL\n")
-      paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1), 
-              ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
-    }
-    
-    paste0(
-      "click: ", xy_str(input$plot_click),
-      "dblclick: ", xy_str(input$plot_dblclick),
-      "hover: ", xy_str(input$plot_hover),
-      "brush: ", xy_range_str(input$plot_brush)
-    )
-  }) ### end scatter plot
+  # output$plot1 <- renderPlot({
+  #   plot(gender_mod$`Rank '18`, gender_mod$`HDI Rank`)
+  # })
+  # 
+  # output$info <- renderText({
+  #   xy_str <- function(e) {
+  #     if(is.null(e)) return("NULL\n")
+  #     paste0(x=2, round(e$x, 1), y=4, round(e$y, 1), "\n")
+  #   }
+  #   xy_range_str <- function(e) {
+  #     if(is.null(e)) return("NULL\n")
+  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1),
+  #             ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
+  #   }
+  # 
+  #   paste0(
+  #     "click: ", xy_str(input$plot_click),
+  #     "dblclick: ", xy_str(input$plot_dblclick),
+  #     "hover: ", xy_str(input$plot_hover),
+  #     "brush: ", xy_range_str(input$plot_brush)
+  #   )
+  # }) ### end scatter plot
 
   ####Slider Map Portion### 
   filter_range <- reactive({
