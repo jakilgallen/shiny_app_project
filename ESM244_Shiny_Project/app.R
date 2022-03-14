@@ -197,30 +197,26 @@ body <- dashboardBody(
              # end fluidrow
     ), # end tab item 
     tabItem(tabName = "scatterplot",
-            fluidRow(
               box(title = "Scatterplot on Gender Equality outcomes and predictors",
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
                   h1("by outcome measure and predictors"),
                   p("alter this interactive plot to see how it affects outputs"),
-                  selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
+                  selectInput(inputId = "xCol", label = "X", choices = "HDI Rank",
                               selected = "HDI Rank"),
-                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank '18", "Maternal Mortality Ratio '15", 
-                                                                         "Adolescent Birth Rate '15-'20", "Seats in Parliment '18"), multiple = TRUE,
-                
-                              selected = "HDI Rank")), # box 1 scatterplot
-              box(plotOutput("plot1",
-                             click = "plot_click",
-                             dblclick = "plot_dblclick",
-                             hover = "plot_hover",
-                             brush = "plot_brush",
-                             inline = FALSE
-            ) # box 2 scatterplot
-            
+                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank ’18", "Maternal Mortality Ratio ’15",
+                                                                         "Adolescent Birth Rate ’15-’20", "Seats in Parliment ’18"),
+                              multiple = TRUE, selected = "Rank ’18")), # end box 1 scatter
+            box(plotOutput("plot1",
+                       click = "plot_click",
+                       dblclick = "plot_dblclick",
+                       hover = "plot_hover",
+                       brush = "plot_brush",
+                       inline = FALSE
             ),
-            verbatimTextOutput("info") 
-    ), # end scatter plot),
+            verbatimTextOutput("info")) # end box 2 scatter 
+    ), # end scatter plot tab
     tabItem(tabName = "involved",
             fluidRow(
               box(title = "Get Informed & Involved",
@@ -261,7 +257,7 @@ body <- dashboardBody(
             ) # end tabName self_model
     
   ) # end tabItems
-) # end dashboardBody
+ )# end dashboardBody
 
 ### Choose theme 
 app_theme <- bs_theme(
@@ -283,7 +279,7 @@ ui <- dashboardPage(header, sidebar, body, skin = "blue")
 server <- function(input, output) {
   ### start server function
   
-  ## function for data table
+  ## REACTIVE DATA TABLE
   output$table <- renderDataTable({ 
     tab_data_table %>% 
       filter(Country == input$incountry) 
@@ -292,7 +288,7 @@ server <- function(input, output) {
     # })
   })
   
-# function for interactive map
+# INTERACTIVE
   ######first creating palette by ge index
   pal <- colorBin(
     palette = "viridis", domain = map_merged$gender_equality_index_18,
@@ -341,25 +337,11 @@ server <- function(input, output) {
   #### Scatter Plot ### 
   df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
- 
-  # Create the plot
-  # output$plot1 <- renderPlot({plot(df2(), pch = 20, cex = 3, col = "blue",
-  #                                 main = "Interactive Scatter Plot")})
-  # 
-output$plot1 <- renderPlot({
-  plot1_df <- ggplot(df2[df2$], aes(x = year, y = Concede_and_Divide_Revenue, color = HmTm)) + 
-  geom_point() + xlab("Year") + ylab("Concede-and-Divide Allocation") + 
-  ggtitle("Concede-and-Divide Rule Allocation 1998-2019") + 
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
-  
-})
-  
+  output$plot1 <- renderPlot({
+    plot(df2(), pch = 20, cex = 3, col = "blue",
+         main = "Interactive Scatter Plot")
   })
   
-  # output$plot1 <- renderPlot({
-  #   plot(gender_mod$`Rank '18`, gender_mod$`HDI Rank`)
-  # })
-  # 
   # output$info <- renderText({
   #   xy_str <- function(e) {
   #     if(is.null(e)) return("NULL\n")
@@ -367,10 +349,10 @@ output$plot1 <- renderPlot({
   #   }
   #   xy_range_str <- function(e) {
   #     if(is.null(e)) return("NULL\n")
-  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1),
+  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1), 
   #             ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
   #   }
-  # 
+  #   
   #   paste0(
   #     "click: ", xy_str(input$plot_click),
   #     "dblclick: ", xy_str(input$plot_dblclick),
