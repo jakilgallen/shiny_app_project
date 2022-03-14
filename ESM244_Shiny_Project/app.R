@@ -23,6 +23,8 @@ library(DT)
 library(rnaturalearth)
 library(sp)
 library(GGally)
+library(broom)
+library(kableExtra)
 
 
 
@@ -80,7 +82,10 @@ tab_data_table <- tab_data_table %>%
 class(tab_data_table$gender_equality_index_18)
 
 tab_data_table %>% 
-  mutate(across(is.numeric, round, digits = 2))
+  mutate(across(is.numeric, round, digits = 2)) %>% 
+  select(!rank_18)
+names(tab_data_table)[3] <- "Gender Equality Index"
+names(tab_data_table)[4] <- "Maternal Mortality Ratio"
 
 
 tab_data_table$Status <- NULL
@@ -160,7 +165,7 @@ body <- dashboardBody(
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
                   selectInput("incountry", "Select a Country", choices = tab_data_table$country)
                   ), # end box1 stats
-              box(tableOutput('table'),
+              box(dataTableOutput('table'),
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20)
@@ -269,8 +274,10 @@ server <- function(input, output) {
   ### start server function
   
   ## function for data table
-  output$table <- renderTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
-    countryfilter <- subset(tab_data_table, tab_data_table$country == input$incountry)
+  output$table <- renderDataTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
+    # countryfilter <- subset(tab_data_table, tab_data_table$country == input$incountry)
+    tab_data_table %>% 
+      filter(country == input$incountry) 
   })
   
 # function for interactive map
@@ -379,7 +386,7 @@ server <- function(input, output) {
   
   output$df <- renderTable({filter_range()})
 
-## Function for build a model
+## Function for MODEL BUILD TAB
   file_data <- reactive({
     file <- input$v_fileinput
     
