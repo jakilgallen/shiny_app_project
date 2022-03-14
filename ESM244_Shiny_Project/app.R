@@ -4,11 +4,11 @@ library(here)
 library(bslib)
 library(ggplot2)
 library(shinythemes)
+library(shinyWidgets)
 library(readxl)
 library(maps)
 library(ggplot2)
 library(dplyr)
-library(httr)
 library(maps)
 library(reshape2)
 library(RColorBrewer)
@@ -139,7 +139,6 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Home", tabName = "home"),
     menuItem("Statistics by Region", tabName = "stats"),
-    menuItem("Interactive Map", tabName = "map"),
     menuItem("Slider of GE Index", tabName = "slider"),
     menuItem("Scatter Plot", tabName = "scatterplot"),
     menuItem("Get Informed & Involved", tabName = "involved" ),
@@ -159,12 +158,18 @@ body <- dashboardBody(
                   p("While Gender Equality has been identified as a critical global goal by the UN and various multinational organizations, 
                       Gender Equality remains far from realized.The purpose of this application is to increase awareness of the current state of 
                       gender equality globally (i.e. across regions and countries) to increase awareness, give individuals resources to become changemakers in their own communities,
-                      and promote positive change."))
+                      and promote positive change.")), # end box 1
+              box(title = "World Map of Gender Equality Indicators",
+                  status = "primary",
+                  solidHeader = TRUE,
+                  width = 20,
+                  p("Hover over individual countries to get information country level information on different gender equality indicators.
+                    This includes XXX")),
+              box(leafletOutput(outputId = "joemap", height = 400, width = 700),
+                  p())
             ), # end fluid row "home"
-            fluidPage(
-              mainPanel(     
-                img(src = "gender-page_v-08.jpeg", height = 450, width = 350)
-              ))),
+            
+              ),
     tabItem(tabName = "stats",
             fluidRow(
               box(title = "Statistics by World Region", 
@@ -173,27 +178,14 @@ body <- dashboardBody(
                   width = 20,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
-                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country, selected = NULL, multiple = TRUE)
+                  # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
+                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country)
                   ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20)
             )),
-    tabItem(tabName = "map",
-            fluidRow(
-              box(title = "World Map of Gender Equality Indicators",
-                  status = "primary",
-                  solidHeader = TRUE,
-                  width = 20,
-                  p("Hover over individual countries to get information country level information on different gender equality indicators.
-                    This includes XXX"))
-            ), # end fluid row
-            fluidPage( ## building output for map
-              leafletOutput(outputId = "joemap", height = 400, width = 700),
-              p()
-            ) # end fluidpage
-    ),
     tabItem(tabName = "slider",
               column(
                 sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
@@ -284,10 +276,12 @@ server <- function(input, output) {
   ### start server function
   
   ## function for data table
-  output$table <- renderDataTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
-    # countryfilter <- subset(tab_data_table, tab_data_table$country == input$incountry)
+  output$table <- renderDataTable({ 
     tab_data_table %>% 
       filter(Country == input$incountry) 
+    # observe({
+    #   print(input$incountry)
+    # })
   })
   
 # function for interactive map
