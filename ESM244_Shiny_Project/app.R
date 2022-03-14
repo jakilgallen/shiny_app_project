@@ -203,11 +203,11 @@ body <- dashboardBody(
                   width = 20,
                   h1("by outcome measure and predictors"),
                   p("alter this interactive plot to see how it affects outputs"),
-                  selectInput(inputId = "xCol", label = "X", choices = "HDI Rank",
+                  selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
                               selected = "HDI Rank"),
                   selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank ’18", "Maternal Mortality Ratio ’15",
                                                                          "Adolescent Birth Rate ’15-’20", "Seats in Parliment ’18"),
-                              multiple = TRUE, selected = "Rank ’18")), # end box 1 scatter
+                              multiple = TRUE, selected = "HDI Rank")), # end box 1 scatter
             box(plotOutput("plot1",
                        click = "plot_click",
                        dblclick = "plot_dblclick",
