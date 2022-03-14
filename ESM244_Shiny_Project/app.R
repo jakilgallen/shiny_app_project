@@ -138,7 +138,6 @@ header <- dashboardHeader(title = "Understanding the State of Gender Equality Gl
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Home", tabName = "home"),
-    menuItem("Statistics by Region", tabName = "stats"),
     menuItem("Slider of GE Index", tabName = "slider"),
     menuItem("Scatter Plot", tabName = "scatterplot"),
     menuItem("Model Your Own Data", tabName = "self_model"),
@@ -149,7 +148,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "home",
-            fluidRow(
+            fluidPage(
               box(title = "Status of Gender Equality Globally",
                   status = "primary",
                   solidHeader = TRUE,
@@ -164,14 +163,9 @@ body <- dashboardBody(
                   solidHeader = TRUE,
                   width = 20,
                   p("Hover over individual countries to get information country level information on different gender equality indicators.
-                    This includes XXX")),
-              box(leafletOutput(outputId = "joemap", height = 400, width = 700),
-                  p())
-            ), # end fluid row "home"
-            
-              ),
-    tabItem(tabName = "stats",
-            fluidRow(
+                    This includes XXX"),
+                  box(leafletOutput(outputId = "joemap", height = 400, width = 700),
+                      p())),
               box(title = "Statistics by World Region", 
                   status = "primary",
                   solidHeader = TRUE,
@@ -180,12 +174,14 @@ body <- dashboardBody(
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
                   # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
                   selectInput("incountry", "Select a Country", choices = tab_data_table$Country)
-                  ), # end box1 stats
+              ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20)
-            )),
+            ), # end fluid row "home"
+            
+              ), # end Tabitem home
     tabItem(tabName = "slider",
               column(
                 sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
@@ -279,16 +275,7 @@ ui <- dashboardPage(header, sidebar, body, skin = "blue")
 server <- function(input, output) {
   ### start server function
   
-  ## REACTIVE DATA TABLE
-  output$table <- renderDataTable({ 
-    tab_data_table %>% 
-      filter(Country == input$incountry) 
-    # observe({
-    #   print(input$incountry)
-    # })
-  })
-  
-# INTERACTIVE
+  # INTERACTIVE MAP
   ######first creating palette by ge index
   pal <- colorBin(
     palette = "viridis", domain = map_merged$gender_equality_index_18,
@@ -310,7 +297,7 @@ server <- function(input, output) {
     map_merged$seats_in_parliment_18, "<br/> "
   ) %>%
     lapply(htmltools::HTML)
-## output of joemap interactive 
+  ## output of joemap interactive 
   output$joemap <- renderLeaflet({
     leaflet(map_merged) %>%
       addTiles() %>%
@@ -330,10 +317,20 @@ server <- function(input, output) {
         opacity = 0.7, title = "Gender Equality Index",
         position = "bottomleft"
       ) #%>% 
-      # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
-      #   addScaleBar(position = "bottomleft") 
+    # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
+    #   addScaleBar(position = "bottomleft") 
   })
   
+  ## REACTIVE DATA TABLE
+  output$table <- renderDataTable({ 
+    tab_data_table %>% 
+      filter(Country == input$incountry) 
+    # observe({
+    #   print(input$incountry)
+    # })
+  })
+  
+
   #### Scatter Plot ### 
   df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
