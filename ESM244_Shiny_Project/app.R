@@ -72,6 +72,16 @@ tab_data <- tab_data %>% arrange(country)
 tab_data_table <- tab_data %>%
   group_by(country, gender_equality_index_18) 
 
+tab_data_table <- tab_data_table %>% 
+  mutate_at(c(3:11), as.numeric) %>% 
+  drop_na()
+
+class(tab_data_table$gender_equality_index_18)
+
+tab_data_table %>% 
+  mutate(across(is.numeric, round, digits = 2))
+
+
 tab_data_table$Status <- NULL
 
 ## creating a subset of the data to use to make a map
@@ -111,12 +121,13 @@ header <- dashboardHeader(title = "Understanding the State of Gender Equality Gl
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("Home", tabName = "home", icon = icon("dashboard")),
+    menuItem("Home", tabName = "home"),
     menuItem("Statistics by Region", tabName = "stats"),
     menuItem("Interactive Map", tabName = "map"),
     menuItem("Slider of GE Index", tabName = "slider"),
     menuItem("Scatter Plot", tabName = "scatterplot"),
-    menuItem("Get Informed & Involved", tabName = "involved" )
+    menuItem("Get Informed & Involved", tabName = "involved" ),
+    menuItem("Model Your Own Data", tabName = "self_model")
   )
 )
 
@@ -146,7 +157,7 @@ body <- dashboardBody(
                   width = 20,
                   h1("Different stats across world regions"),
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
-                  DTOutput('table', height = 250, width = 250))
+                  tableOutput('table'))
             )),
     tabItem(tabName = "map",
             fluidRow(
@@ -216,7 +227,8 @@ body <- dashboardBody(
                   tags$a(href = "https://www.womenforwomen.org/why-women?src=GGEV222A&ms=cpc_google_awarness&utm_medium=cpc&utm_source=google&utm_campaign=awarness&utm_content=gg+ad&gclid=CjwKCAiA6seQBhAfEiwAvPqu15YD5SrFnaJz-3sM3iKAcftHXb8qZJyfFvTu5r889wcdBEAYa4STQhoC7nwQAvD_BwE", "Women for Women International")
             ))
             
-    )
+    ),
+    tabItem(tabName = "self_model")
     
   ) # end tabItems
 ) # end dashboardBody
@@ -242,7 +254,7 @@ server <- function(input, output) {
   ### start server function
   
   ## function for data table
-  output$table <- renderDT({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
+  output$table <- renderTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
     tab_data_table
   })
   

@@ -80,6 +80,21 @@ tab_data <- tab_data %>% arrange(country)
 tab_data_table <- tab_data %>%
   group_by(country, gender_equality_index_18) 
 
+
+tab_data_table %>% 
+  mutate(across(is.numeric, round, digits = 3))
+
+## ok need to round the data so first converting to numeric and then running round on all numeric
+
+tab_data_table <- tab_data_table %>% 
+     mutate_at(c(3:11), as.numeric) %>% 
+  drop_na()
+
+class(tab_data_table$gender_equality_index_18)
+
+tab_data_table %>% 
+  mutate(across(is.numeric, round, digits = 2))
+
 tab_data_table$Status <- NULL
 ```
 
