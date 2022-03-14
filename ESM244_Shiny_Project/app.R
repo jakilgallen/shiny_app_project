@@ -159,7 +159,10 @@ body <- dashboardBody(
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
                   selectInput("incountry", "Select a Country", choices = tab_data_table$country)
                   ), # end box1 stats
-              box(tableOutput('table'))
+              box(tableOutput('table'),
+                  status = "primary",
+                  solidHeader = TRUE,
+                  width = 20)
             )),
     tabItem(tabName = "map",
             fluidRow(
@@ -257,7 +260,7 @@ server <- function(input, output) {
   
   ## function for data table
   output$table <- renderTable({ #maybe check this later to improve DT https://www.paulamoraga.com/book-geospatial/sec-flexdashboard.html
-    tab_data_table
+    countryfilter <- subset(tab_data_table, tab_data_table$country == input$incountry)
   })
   
 # function for interactive map
