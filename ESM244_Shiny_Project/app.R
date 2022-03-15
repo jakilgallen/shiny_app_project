@@ -193,7 +193,8 @@ body <- dashboardBody(
                   width = 20,
                   p("If you want to search one country in particular use the search bar below!"),
                   # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
-                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country, multiple = TRUE)
+                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country, multiple = TRUE,
+                              selected = "China")
               ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
@@ -220,11 +221,7 @@ body <- dashboardBody(
                   width = 20,
                   p("alter this interactive plot to see how it affects outputs"),
                   selectInput(inputId = "plotcountry", label = "Country", choices = tab_data_table$Country, multiple = TRUE,
-                              selected = "Tanzania"),
-                  selectInput(inputId = 'xcol', label = "X", choices = c("gender_equality_index_18", "hdi_rank")),
-                  selectInput(inputId = 'ycol', label = "Y", choices = c("rank_18", "maternal_mortality_ratio_15",
-                                                                         "adolescent_birth_rate_15_20", "seats_in_parliament_18"),
-                              multiple = TRUE, selected = "maternal_mortality_ratio_15")), # end box 1 scatter
+                              selected = "Tanzania")), # end box 1 scatter
             box(status = "primary",
                 solidHeader = TRUE,
                 width = 20,
@@ -276,7 +273,11 @@ body <- dashboardBody(
                          actionButton("v_button", "Run Model"),
                          textInput("v_filename", label = "Filename", value = "model_results.csv", placeholder = "model_results.csv"),
                          downloadButton("v_download", "Download Summary"))),
-            fluidRow(box(plotOutput("explore_plot")), box(plotOutput("model_plot")),
+            fluidRow(box(title = "Exploratory Correlation Plot",
+                         status = "primary",
+                         solidHeader = TRUE, plotOutput("explore_plot")), box(title = "Linear Model Output",
+                                                                              status = "primary",
+                                                                              solidHeader = TRUE, plotOutput("model_plot")),
             
                      ) # end fluidRow
             ) # end tabName self_model
@@ -362,48 +363,36 @@ server <- function(input, output) {
 
   #### Scatter Plot ### 
   
+  ### making reactive function to select country
   plotdata <- reactive({
     req(input$plotcountry)
-    df <- tab_data_table %>% filter(Country %in% input$plotcountry)
+    filter(tab_data_table, Country %in% input$plotcountry)
   })
   
-  # x_react <- reactive({
-  #   req(input$xcol)
-  #   df_x <- tab_data %>% filter(tab_data == input$xcol)
-  # })
-  # 
-  # y_react <- reactive({
-  #   req(input$ycol)
-  #   df_y <- tab_data %>% filter(tab_data == input$ycol)
-  # })
-  
-  # df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
   output$plot1 <- renderPlot({
-    g <- ggplot(plotdata(), aes(y = tab_data_table$maternal_mortality_ratio_15, x = tab_data_table$gender_equality_index))
-    g + geom_point()
+    plot(plotdata(), pch = 20, cex = 3, col = "blue",
+         main = "Interactive Scatter Plot")
+
   })
-  
-  # plot(plotdata(), pch = 20, cex = 3, col = "blue",
-  #      main = "Interactive Scatter Plot")
-  # output$info <- renderText({
-  #   xy_str <- function(e) {
-  #     if(is.null(e)) return("NULL\n")
-  #     paste0(x=2, round(e$x, 1), y=4, round(e$y, 1), "\n")
-  #   }
-  #   xy_range_str <- function(e) {
-  #     if(is.null(e)) return("NULL\n")
-  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1), 
-  #             ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
-  #   }
-  #   
-  #   paste0(
-  #     "click: ", xy_str(input$plot_click),
-  #     "dblclick: ", xy_str(input$plot_dblclick),
-  #     "hover: ", xy_str(input$plot_hover),
-  #     "brush: ", xy_range_str(input$plot_brush)
-  #   )
-  # }) ### end scatter plot
+  output$info <- renderText({
+    xy_str <- function(e) {
+      if(is.null(e)) return("NULL\n")
+      paste0(x=2, round(e$x, 1), y=4, round(e$y, 1), "\n")
+    }
+    xy_range_str <- function(e) {
+      if(is.null(e)) return("NULL\n")
+      paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1),
+              ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
+    }
+
+    paste0(
+      "click: ", xy_str(input$plot_click),
+      "dblclick: ", xy_str(input$plot_dblclick),
+      "hover: ", xy_str(input$plot_hover),
+      "brush: ", xy_range_str(input$plot_brush)
+    )
+  }) ### end scatter plot
 
   ####Slider Map Portion### 
   filter_range <- reactive({
