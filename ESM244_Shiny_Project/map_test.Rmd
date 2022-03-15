@@ -95,6 +95,31 @@ class(tab_data_table$gender_equality_index_18)
 tab_data_table %>% 
   mutate(across(is.numeric, round, digits = 2))
 
+tab_data_table <- tab_data_table %>% 
+  mutate_at(c(3:11), as.numeric) %>% 
+  drop_na()
+
+tab_data_table %>% 
+  mutate(across(is.numeric, round, digits = 2)) 
+
+## changing names to make table look better
+names(tab_data_table)[1] <- "Country"
+names(tab_data_table)[2] <- "Human Development Index Rank"
+names(tab_data_table)[3] <- "Gender Equality Index"
+names(tab_data_table)[3] <- "Gender Equality Index"
+names(tab_data_table)[4] <- "Country Rank"
+names(tab_data_table)[5] <- "Maternal Mortality Ratio"
+names(tab_data_table)[6] <- "Adolescent Birth Rate"
+names(tab_data_table)[7] <- "Seats in Parliament"
+names(tab_data_table)[8] <- "% of Women with Secondary Education"
+names(tab_data_table)[9] <- "% of Men with Secondary Education"
+names(tab_data_table)[10] <- "% of Female Labour Force Participation"
+names(tab_data_table)[11] <- "% of Male Labour Force Participation"
+
+
+
+tab_data_table$Status <- NULL
+
 tab_data_table$Status <- NULL
 ```
 
@@ -116,16 +141,31 @@ map <- ne_countries()
 names(map)[names(map) == "iso_a3"] <- "ISO3"
 names(map)[names(map) == "name"] <- "country"
 
+map$country
+
 head(map)
 
+## cleaning the names so they match with map names
+map_data[map_data == "Bolivia (Plurinational State of)"] <- "Bolivia"
+map_data[map_data == "Russian Federation"] <- "Russia"
+map_data[map_data == "Venezuela (Bolivarian Republic of)"] <- "Venezuela"
+map_data[map_data == "Tanzania (United Republic of)"] <- "Tanzania"
+map_data[map_data == "Iran (Islamic Republic of)"] <- "Iran"
+map_data[map_data == "Congo (Democratic Republic of the)"] <- "Dem. Rep. Congo"
+map_data[map_data == "Central African Republic"] <- "Central African Rep."
+
+
 # base plot of map
-plot(map)
+
+map_data
 
 map_merged <- merge(x = map, y = map_data, by = "country", all.x = TRUE)
 
 class(map_merged)
 
 map_merged$gender_equality_index_18 <- as.numeric(map_merged$gender_equality_index_18)
+
+
 
   
 ## trying to create map with leaflet

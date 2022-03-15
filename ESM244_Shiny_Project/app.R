@@ -118,6 +118,15 @@ names(map)[names(map) == "iso_a3"] <- "ISO3"
 names(map)[names(map) == "name"] <- "country"
 
 head(map)
+## cleaning the names so they match with map names
+map_data[map_data == "Bolivia (Plurinational State of)"] <- "Bolivia"
+map_data[map_data == "Russian Federation"] <- "Russia"
+map_data[map_data == "Venezuela (Bolivarian Republic of)"] <- "Venezuela"
+map_data[map_data == "Tanzania (United Republic of)"] <- "Tanzania"
+map_data[map_data == "Iran (Islamic Republic of)"] <- "Iran"
+map_data[map_data == "Congo (Democratic Republic of the)"] <- "Dem. Rep. Congo"
+map_data[map_data == "Central African Republic"] <- "Central African Rep."
+
 
 # merging the data with our gender data
 map_merged <- merge(x = map, y = map_data, by = "country", all.x = TRUE)
