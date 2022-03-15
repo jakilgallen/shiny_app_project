@@ -183,13 +183,14 @@ body <- dashboardBody(
                   p("The purpose of this app is to create a hub for all things gender equality so that both experts and lay people can engage with this topic and learn about ongoing events without having to search through academic articles
                     or evaluate difficult statistical models. Here we provide several simple and interactive widgers in which: users can explore major indicators of gender equality to better determine what this loaded term means,
                     world maps so users can examine how these indicators vary across the globe, a function to load in external data and create a model oneself, and information on current events concerning gender equality
-                    in the news as well as ways to get involved!")), # end box 1
+                    in the news as well as ways to get involved!"),
+                  p("Data Citation: ")), # end box 1
               box(title = "World Map of Gender Equality Indicators",
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
                   p("Explore the various gender equality indicators by country! Hover over the various countries on the map to get statistics on globally recognized gender equality indicators such as
-                    the gender equality index, female education, maternal mortality, female seats in parliament, and more!"),
+                    the gender equality index, female education, maternal mortality, female seats in parliament, etc."),
                   leafletOutput(outputId = "joemap", height = 400, width = 700)),
               box(title = "Statistics by World Region", 
                   status = "primary",
@@ -204,10 +205,17 @@ body <- dashboardBody(
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20),
-              box(p("This is what those indicators mean"))
-            ), # end fluid row "home"
-            
-              ), # end Tabitem home
+              box(title = "Data Summary and Citation",
+                status = "primary",
+                  solidHeader = TRUE,
+                  width = 20),
+                  p("Data Summary: The Human Development Report is a reliable source and an alternative perspective on critical issues for human development worldwide. 
+              Featuring the Human Development Index, every report presents agenda-setting data and analysis and calls international attention to issues and policy options that put people at the center of strategies to meet the challenges of development today 
+              - economic, social, political, and cultural."),
+                p("Data Citation: United Nations. (n.d.). UNdata | Table Presentation | Gender inequality index. United Nations. Retrieved March 15, 2022, from http://data.un.org/DocumentData.aspx?id=415"),
+                p("Last update in UNdata: 2020/02/06
+                  Next update in UNdata: 2021/02/01"))
+            ), # end fluid row "home" # end Tabitem home
     tabItem(tabName = "slider",
               fluidPage(box(status = "primary",
                   solidHeader = TRUE,
@@ -238,8 +246,7 @@ body <- dashboardBody(
             verbatimTextOutput("info")) # end box 2 scatter 
     )), # end scatter plot tab
     tabItem(tabName = "involved",
-            fluidRow(
-              box(title = "Get Informed & Involved",
+              box(title = "Get Informed",
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
@@ -247,9 +254,11 @@ body <- dashboardBody(
                   tags$a(href = "https://www.nytimes.com/2019/12/04/us/domestic-violence-international.html", "New York Times- 'Across The Globe, a Serious Backlash Against Women's Rights"),
                   p(" "),
                   tags$a(href = "https://www.bbc.com/news/world-51751915", "'BBC-- 'Gender study finds 90% of people are biased against women",
-                  ),
-                  h1("Get Involved"),
-                  p("See list of ongoing interventions and ways to get involved"),
+                  )),
+              box(title = "Get Involved",
+                  h1("List of Ongoing Interventions"),
+                  p("Below is a list of programs and interventiosn that are operating across the globe targetting the various indicators of gender equality discussed on this app!
+                    If you wish to get involved or learn about what projects are currently in process explore the links below!"),
                   tags$a(href = "https://promundoglobal.org/work/", "Promundo"),
                   p(" "),
                   tags$a(href = "https://menengage.org/", "Men Engage"),
@@ -261,8 +270,7 @@ body <- dashboardBody(
                   tags$a(href = "https://womenvoicenetwork.com/?gclid=CjwKCAiA6seQBhAfEiwAvPqu15TX_8nrpABjwIieQdyJgTCRgwCC42rOqrwOa0OMwL_3iHk4PXtJnhoCe24QAvD_BwE", "Women Voice Network"),
                   p(" "),
                   tags$a(href = "https://www.womenforwomen.org/why-women?src=GGEV222A&ms=cpc_google_awarness&utm_medium=cpc&utm_source=google&utm_campaign=awarness&utm_content=gg+ad&gclid=CjwKCAiA6seQBhAfEiwAvPqu15YD5SrFnaJz-3sM3iKAcftHXb8qZJyfFvTu5r889wcdBEAYa4STQhoC7nwQAvD_BwE", "Women for Women International")
-            ))
-            
+            ) # end box 2
     ),
     tabItem(tabName = "self_model",
             fluidRow(box(title = "Build a Model",
@@ -280,14 +288,13 @@ body <- dashboardBody(
                          status = "primary",
                          solidHeader = TRUE, plotOutput("explore_plot")), box(title = "Linear Model Output",
                                                                               status = "primary",
-                                                                              solidHeader = TRUE, plotOutput("model_plot")),
+                                                                              solidHeader = TRUE, plotOutput("model_plot"))
             
                      ) # end fluidRow
             ) # end tabName self_model
-    
-  ) 
- )# end tabItems
- # end dashboardBody
+  )# end tabItems
+)# end dashboardBody
+ 
 
 ### Choose theme 
 app_theme <- bs_theme(
