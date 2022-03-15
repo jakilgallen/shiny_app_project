@@ -214,11 +214,10 @@ body <- dashboardBody(
              # end fluidrow
     ), # end tab item 
     tabItem(tabName = "scatterplot",
-              box(title = "Scatterplot on Gender Equality outcomes and predictors",
+              box(title = "Scatterplot on Gender Equality Outcomes and Predictors",
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                  h1("by outcome measure and predictors"),
                   p("alter this interactive plot to see how it affects outputs"),
                   selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
                               selected = "HDI Rank"),
@@ -358,10 +357,16 @@ server <- function(input, output) {
   
 
   #### Scatter Plot ### 
-  df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
+  
+  plotdata <- reactive({
+    gender_mod %>% 
+      filter(x == inputinput$xCol) %>% 
+      filter(y == input$yCol)
+  })
+  # df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
   output$plot1 <- renderPlot({
-    plot(df2(), pch = 20, cex = 3, col = "blue",
+    plot(plotdata(), pch = 20, cex = 3, col = "blue",
          main = "Interactive Scatter Plot")
   })
   
