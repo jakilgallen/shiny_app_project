@@ -198,7 +198,8 @@ body <- dashboardBody(
               box(dataTableOutput('table'),
                   status = "primary",
                   solidHeader = TRUE,
-                  width = 20)
+                  width = 20),
+              box(p("This is what those indicators mean"))
             ), # end fluid row "home"
             
               ), # end Tabitem home
@@ -261,13 +262,18 @@ body <- dashboardBody(
             
     ),
     tabItem(tabName = "self_model",
+            fluidRow(box(title = "Build a Model",
+                         status = "primary",
+                         solidHeader = TRUE,
+                         p("Use the 'browse' button to upload data of your choice then select the target variable you wish to predict!"), 
+                         p("When you are ready hit the 'Run Model' 
+                           button."),
+                         p("Once you are happy with the model, you can download the results using the 'Download Summary' button.")), box(fileInput("v_fileinput", label = "Upload File"),
+                         uiOutput("target_var"),
+                         actionButton("v_button", "Run Model"),
+                         textInput("v_filename", label = "Filename", value = "model_results.csv", placeholder = "model_results.csv"),
+                         downloadButton("v_download", "Download Summary"))),
             fluidRow(box(plotOutput("explore_plot")), box(plotOutput("model_plot")),
-            box(fileInput("v_fileinput", label = "Upload File"),
-                uiOutput("target_var"),
-                actionButton("v_button", "Run Model"),
-                textInput("v_filename", label = "Filename", value = "model_results.csv", placeholder = "model_results.csv"),
-                downloadButton("v_download", "Download Summary")
-            )
             
                      ) # end fluidRow
             ) # end tabName self_model
