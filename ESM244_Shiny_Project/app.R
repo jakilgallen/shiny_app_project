@@ -208,19 +208,22 @@ body <- dashboardBody(
                 status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                  p("Data Summary: The Human Development Report is a reliable source and an alternative perspective on critical issues for human development worldwide. 
+                  p("Data Summary: 'The Human Development Report is a reliable source and an alternative perspective on critical issues for human development worldwide. 
               Featuring the Human Development Index, every report presents agenda-setting data and analysis and calls international attention to issues and policy options that put people at the center of strategies to meet the challenges of development today 
-              - economic, social, political, and cultural."),
+              - economic, social, political, and cultural.'"),
                 p("Data Citation: United Nations. (n.d.). UNdata | Table Presentation | Gender inequality index. United Nations. Retrieved March 15, 2022, from http://data.un.org/DocumentData.aspx?id=415"),
                 p("Last update in UNdata: 2020/02/06
                   Next update in UNdata: 2021/02/01"))
             )), # end fluid row "home" # end Tabitem home
     tabItem(tabName = "slider",
-              (box(status = "primary",
+              box(title = "Gender Equality Index Slider",
+                status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
-                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6)))),
+                  p("Adjust the slider below to see what Countries fall within the range of Gender Equality Index values."),
+                  p("Values closer to 0 represent a more gender egalitarian relationship, while those closer to one represent more patriarchal gender systems."),
+                sliderInput("mapsel", label = "Slider Range", min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
+                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6))),
             box(status = "primary",
                 solidHeader = TRUE,
                 width = 20,
