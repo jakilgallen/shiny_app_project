@@ -58,6 +58,10 @@ gender_mod <- gender_data %>%
 
 gender_mod <- merge(x = gender_mod, y = world_data_clean, by = "Country", all.x = TRUE)
 
+scatter_data <- gender_mod %>% 
+  select(c("Country", "Gender Equality Index '18", "Adolescent Birth Rate '15-'20", "Seats in Parliment '18", "Secondary Education (F)'10-'18",
+           "Labour Force Participation (F)'18"))
+
 
 
 ## Creating a subset of the data to use to make the table
@@ -205,23 +209,22 @@ body <- dashboardBody(
             
               ), # end Tabitem home
     tabItem(tabName = "slider",
-              column(
+              fluidPage(box(status = "primary",
+                  solidHeader = TRUE,
                 sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
-                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6)), width = 1.5),
-            # textOutput("selected_var"),
-            # tableOutput("df")
-            leafletOutput(outputId = "mymap", height = 500)
-              # end mainpanel
-             # end fluidrow
+                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6))),
+            box(status = "primary",
+                solidHeader = TRUE,
+                leafletOutput(outputId = "mymap", height = 500))) # end fluid page
     ), # end tab item 
     tabItem(tabName = "scatterplot",
               box(title = "Scatterplot on Gender Equality Outcomes and Predictors",
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                  p("alter this interactive plot to see how it affects outputs"),
-                  selectInput(inputId = "plotcountry", label = "Country", choices = tab_data_table$Country, multiple = TRUE,
-                              selected = "Tanzania")), # end box 1 scatter
+                  p("Select one or multiple countries below to see how they compare on various GE indicators."),
+                  selectInput(inputId = "plotcountry", label = "Select Country", choices = scatter_data$Country, multiple = TRUE,
+                              selected = c("Nicaragua", "Australia")), # end box 1 scatter
             box(status = "primary",
                 solidHeader = TRUE,
                 width = 20,
@@ -233,7 +236,7 @@ body <- dashboardBody(
                        inline = FALSE
             ),
             verbatimTextOutput("info")) # end box 2 scatter 
-    ), # end scatter plot tab
+    )), # end scatter plot tab
     tabItem(tabName = "involved",
             fluidRow(
               box(title = "Get Informed & Involved",
@@ -245,7 +248,7 @@ body <- dashboardBody(
                   p(" "),
                   tags$a(href = "https://www.bbc.com/news/world-51751915", "'BBC-- 'Gender study finds 90% of people are biased against women",
                   ),
-                  h2("Get Involved"),
+                  h1("Get Involved"),
                   p("See list of ongoing interventions and ways to get involved"),
                   tags$a(href = "https://promundoglobal.org/work/", "Promundo"),
                   p(" "),
@@ -282,8 +285,9 @@ body <- dashboardBody(
                      ) # end fluidRow
             ) # end tabName self_model
     
-  ) # end tabItems
- )# end dashboardBody
+  ) 
+ )# end tabItems
+ # end dashboardBody
 
 ### Choose theme 
 app_theme <- bs_theme(
@@ -366,7 +370,7 @@ server <- function(input, output) {
   ### making reactive function to select country
   plotdata <- reactive({
     req(input$plotcountry)
-    filter(tab_data_table, Country %in% input$plotcountry)
+    filter(scatter_data, Country %in% input$plotcountry)
   })
   
   
