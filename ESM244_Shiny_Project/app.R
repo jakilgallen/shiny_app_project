@@ -375,19 +375,35 @@ server <- function(input, output) {
   
 
   #### Scatter Plot ### 
-  
   ### making reactive function to select country
   plotdata <- reactive({
     req(input$plotcountry)
     filter(scatter_data, Country %in% input$plotcountry)
   })
   
-  
   output$plot1 <- renderPlot({
-    plot(plotdata(), pch = 20, cex = 3, col = "blue",
-         main = "Interactive Scatter Plot")
-
+    plot(plotdata())
   })
+  
+  # output$plot1 <- renderPlot({
+  #   scatter_data %>% 
+  #     filter(Country == input$plotcountry) %>% 
+  #     select(2:6) %>% gather() %>% 
+  #     group_by(key) %>% 
+  #     summarise(value = mean(value)) %>% 
+  #     ungroup() %>% 
+  #     mutate(key = str_replace(key, "_", " ") %>% str_to_title()) %>% 
+  #     mutate(key = fct_reorder(key, value)) %>% 
+  #     ggplot(aes(x = key, y = value, color = key)) + 
+  #     geom_point(size = 5) + 
+  #     geom_segment(aes(x = key, xend = key, y = value, yend = 0)) + 
+  #     theme(legend.position = "none") + 
+  #     ylab("") + 
+  #     xlab("") + 
+  #     coord_flip()
+  #     })
+  
+  ### text output
   output$info <- renderText({
     xy_str <- function(e) {
       if(is.null(e)) return("NULL\n")

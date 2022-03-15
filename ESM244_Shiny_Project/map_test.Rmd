@@ -15,7 +15,6 @@ library(ggplot2)
 library(shinythemes)
 library(readxl)
 library(magrittr)
-library(rvest)
 library(dplyr)
 library(httr)
 library(maps)
@@ -58,6 +57,10 @@ gender_mod <- gender_data %>%
          "Labour Force Participation (M)'18" = ...19) %>%
   select(-...4,-...6,-...8,-...10,-...12,-...14,-...16,-...18,-...20) %>%
   filter(!row_number() %in% c(1, 2, 3, 4, 5, 228:261))
+
+scatter_data <- gender_mod %>% 
+  select(c("Country", "Gender Equality Index '18", "Adolescent Birth Rate '15-'20", "Seats in Parliment '18", "Secondary Education (F)'10-'18",
+           "Labour Force Participation (F)'18"))
 
 ```
 
