@@ -126,6 +126,11 @@ map_data[map_data == "Tanzania (United Republic of)"] <- "Tanzania"
 map_data[map_data == "Iran (Islamic Republic of)"] <- "Iran"
 map_data[map_data == "Congo (Democratic Republic of the)"] <- "Dem. Rep. Congo"
 map_data[map_data == "Central African Republic"] <- "Central African Rep."
+map_data[map_data == "South Sudan"] <- "S. Sudan"
+map_data[map_data == "Viet Nam"] <- "Vietnam"
+map_data[map_data == "Lao People's Democratic Republic"] <- "Lao PDR"
+map_data[map_data == "United States"] <- "United States"
+map_data[map_data == "Syrian Arab Republic"] <- "Syria"
 
 
 # merging the data with our gender data
@@ -328,7 +333,7 @@ server <- function(input, output) {
       ) %>%
       leaflet::addLegend(
         pal = pal, values = ~gender_equality_index_18,
-        opacity = 0.7, title = "Gender Equality Index",
+        opacity = 0.5, title = "Gender Equality Index",
         position = "bottomleft"
       ) #%>% 
     # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 

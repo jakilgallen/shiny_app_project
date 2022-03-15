@@ -25,7 +25,6 @@ library(RColorBrewer)
 library(leaflet)
 library(magrittr)
 library(sf)
-library(rvest)
 library(tidyr)
 library(maptools)
 library(rgdal)
@@ -153,6 +152,10 @@ map_data[map_data == "Tanzania (United Republic of)"] <- "Tanzania"
 map_data[map_data == "Iran (Islamic Republic of)"] <- "Iran"
 map_data[map_data == "Congo (Democratic Republic of the)"] <- "Dem. Rep. Congo"
 map_data[map_data == "Central African Republic"] <- "Central African Rep."
+map_data[map_data == "South Sudan"] <- "S. Sudan"
+map_data[map_data == "Viet Nam"] <- "Vietnam"
+map_data[map_data == "Lao People's Democratic Republic"] <- "Lao PDR"
+map_data[map_data == "Syrian Arab Republic"] <- "Syria"
 
 
 # base plot of map
