@@ -96,6 +96,8 @@ names(tab_data_table)[9] <- "% of Men with Secondary Education"
 names(tab_data_table)[10] <- "% of Female Labour Force Participation"
 names(tab_data_table)[11] <- "% of Male Labour Force Participation"
 
+tab_data_table <- tab_data_table %>% 
+  select(c("Gender Equality Index", "Seats in Parliament", "% of Women with Secondary Education","% of Female Labour Force Participation"))
 
 
 tab_data_table$Status <- NULL
@@ -170,8 +172,9 @@ body <- dashboardBody(
                   h1('Overview:'),
                   p("While Gender Equality has been identified as a critical global goal by the UN in its Millenium Development Goals, gained increased global attention with movements such as #MeToo and 
                   and recent large scale women's marches, research demonstrates that the general public is quite confused as to the current state of gender equality globally. Due to the ever-increasing visibility of this issue
-                  some researchers have found a trend in which many individuals (but men in particular) believe gender equality to already be realized. This misconception is dangerous as it has been linked to increased resistance to 
-                  ongoing efforts to promote gender equality globally, a phenomena feminist theorists have termed 'backlash'. With the plethora of (often conflicting) information on gender equality and women's empowerment
+                  some researchers have found a trend in which many individuals (but men in particular) believe gender equality to already be realized."),
+                  p("This misconception is dangerous as it has been linked to increased resistance to 
+                    ongoing efforts to promote gender equality globally, a phenomena feminist theorists have termed 'backlash'. With the plethora of (often conflicting) information on gender equality and women's empowerment
                     it is truly difficult to determine where are we at as a global society in achieving these goals?"),
                   p("The purpose of this app is to create a hub for all things gender equality so that both experts and lay people can engage with this topic and learn about ongoing events without having to search through academic articles
                     or evaluate difficult statistical models. Here we provide several simple and interactive widgers in which: users can explore major indicators of gender equality to better determine what this loaded term means,
@@ -181,18 +184,16 @@ body <- dashboardBody(
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                  p("Hover over individual countries to get information country level information on different gender equality indicators.
-                    This includes XXX"),
-                  box(leafletOutput(outputId = "joemap", height = 400, width = 700),
-                      p())),
+                  p("Explore the various gender equality indicators by country! Hover over the various countries on the map to get statistics on globally recognized gender equality indicators such as
+                    the gender equality index, female education, maternal mortality, female seats in parliament, and more!"),
+                  leafletOutput(outputId = "joemap", height = 400, width = 700)),
               box(title = "Statistics by World Region", 
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
-                  h1("Different stats across world regions"),
-                  p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
+                  p("If you want to search one country in particular use the search bar below!"),
                   # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
-                  selectInput("incountry", "Select a Country", choices = tab_data_table$Country)
+                  selectInput("incountry", "Select a Country", choices = c("ALL", tab_data_table$Country))
               ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
