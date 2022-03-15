@@ -193,7 +193,7 @@ body <- dashboardBody(
                   width = 20,
                   p("If you want to search one country in particular use the search bar below!"),
                   # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
-                  selectInput("incountry", "Select a Country", choices = c("ALL", tab_data_table$Country))
+                  selectInput("incountry", "Select a Country", choices = c("ALL", tab_data_table$Country), multiple = TRUE)
               ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
@@ -219,11 +219,12 @@ body <- dashboardBody(
                   solidHeader = TRUE,
                   width = 20,
                   p("alter this interactive plot to see how it affects outputs"),
-                  selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
-                              selected = "HDI Rank"),
-                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank ’18", "Maternal Mortality Ratio ’15",
-                                                                         "Adolescent Birth Rate ’15-’20", "Seats in Parliment ’18"),
-                              multiple = TRUE, selected = "HDI Rank")), # end box 1 scatter
+                  selectInput(inputId = "plotcountry", label = "Country", choices = tab_data$country,
+                              selected = "United States"),
+                  selectInput(inputId = 'xcol', label = "X", choices = c("gender_equality_index_18, hdi_rank")),
+                  selectInput(inputId = 'ycol', label = "Y", choices = c("rank_18", "maternal_mortality_ratio_15",
+                                                                         "adolescent_birth_rate_15_20", "seats_in_parliament_18"),
+                              multiple = TRUE, selected = "maternal_mortality_ratio_15")), # end box 1 scatter
             box(plotOutput("plot1",
                        click = "plot_click",
                        dblclick = "plot_dblclick",
@@ -349,7 +350,7 @@ server <- function(input, output) {
   ## REACTIVE DATA TABLE
   output$table <- renderDataTable({ 
     tab_data_table %>% 
-      filter(Country == input$incountry) 
+      filter(Country %in% input$incountry) 
     # observe({
     #   print(input$incountry)
     # })
@@ -359,17 +360,29 @@ server <- function(input, output) {
   #### Scatter Plot ### 
   
   plotdata <- reactive({
-    gender_mod %>% 
-      filter(x == inputinput$xCol) %>% 
-      filter(y == input$yCol)
+    req(input$plotcountry)
+    df <- tab_data %>% filter(country %in% input$plotcountry)
   })
+  
+  x_react <- reactive({
+    req(input$xcol)
+    df_x <- tab_data %>% filter(X %in% input$xcol)
+  })
+  
+  y_react <- reactive({
+    req(input$ycol)
+    df_y <- tab_data %>% filter(Y %in% input$ycol)
+  })
+  
   # df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
   output$plot1 <- renderPlot({
-    plot(plotdata(), pch = 20, cex = 3, col = "blue",
-         main = "Interactive Scatter Plot")
+    g <- ggplot(plotdata(), aes(y = y_react(), x = x_react()))
+    g + geom_point()
   })
   
+  # plot(plotdata(), pch = 20, cex = 3, col = "blue",
+  #      main = "Interactive Scatter Plot")
   # output$info <- renderText({
   #   xy_str <- function(e) {
   #     if(is.null(e)) return("NULL\n")
