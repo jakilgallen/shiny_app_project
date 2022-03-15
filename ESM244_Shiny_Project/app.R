@@ -191,7 +191,7 @@ body <- dashboardBody(
                   p("Explore the various gender equality indicators by country! Hover over the various countries on the map to get statistics on globally recognized gender equality indicators such as
                     the gender equality index, female education, maternal mortality, female seats in parliament, etc."),
                   leafletOutput(outputId = "joemap", height = 400, width = 700)),
-              box(title = "Statistics by World Region", 
+              box(title = "Statistics by Country", 
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20,
@@ -216,13 +216,15 @@ body <- dashboardBody(
                   Next update in UNdata: 2021/02/01"))
             )), # end fluid row "home" # end Tabitem home
     tabItem(tabName = "slider",
-              fluidPage(box(status = "primary",
+              (box(status = "primary",
                   solidHeader = TRUE,
+                  width = 20,
                 sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
-                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6))),
+                            max = round(max(map_data$gender_equality_index_18,na.rm = T),2), value = c(0.1, 0.6)))),
             box(status = "primary",
                 solidHeader = TRUE,
-                leafletOutput(outputId = "mymap", height = 500))) # end fluid page
+                width = 20,
+                leafletOutput(outputId = "mymap", height = 500)) # end fluid page
     ), # end tab item 
     tabItem(tabName = "scatterplot",
               box(title = "Scatterplot on Gender Equality Outcomes and Predictors",
