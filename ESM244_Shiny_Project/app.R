@@ -95,9 +95,6 @@ names(tab_data_table)[8] <- "% of Women with Secondary Education"
 names(tab_data_table)[9] <- "% of Men with Secondary Education"
 names(tab_data_table)[10] <- "% of Female Labour Force Participation"
 names(tab_data_table)[11] <- "% of Male Labour Force Participation"
-
-
-
 tab_data_table$Status <- NULL
 
 ## creating a subset of the data to use to make a map
@@ -138,6 +135,7 @@ header <- dashboardHeader(title = "Understanding the State of Gender Equality Gl
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Home", tabName = "home"),
+    menuItem("Statistics by Region", tabName = "stats"),
     menuItem("Slider of GE Index", tabName = "slider"),
     menuItem("Scatter Plot", tabName = "scatterplot"),
     menuItem("Model Your Own Data", tabName = "self_model"),
@@ -148,7 +146,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "home",
-            fluidPage(
+            fluidRow(
               box(title = "Status of Gender Equality Globally",
                   status = "primary",
                   solidHeader = TRUE,
@@ -163,9 +161,14 @@ body <- dashboardBody(
                   solidHeader = TRUE,
                   width = 20,
                   p("Hover over individual countries to get information country level information on different gender equality indicators.
-                    This includes XXX"),
-                  box(leafletOutput(outputId = "joemap", height = 400, width = 700),
-                      p())),
+                    This includes XXX")),
+              box(leafletOutput(outputId = "joemap", height = 400, width = 700),
+                  p())
+            ), # end fluid row "home"
+            
+              ),
+    tabItem(tabName = "stats",
+            fluidRow(
               box(title = "Statistics by World Region", 
                   status = "primary",
                   solidHeader = TRUE,
@@ -174,14 +177,12 @@ body <- dashboardBody(
                   p("Here you can see a Quick summary on state of affairs, i.e. women's empowerment, IPV, etc."),
                   # shinyWidgets::pickerInput("incountry", "Select a Country", choices = tab_data_table$Country, options = list(`action-box` = TRUE), multiple = TRUE)
                   selectInput("incountry", "Select a Country", choices = tab_data_table$Country)
-              ), # end box1 stats
+                  ), # end box1 stats
               box(dataTableOutput('table'),
                   status = "primary",
                   solidHeader = TRUE,
                   width = 20)
-            ), # end fluid row "home"
-            
-              ), # end Tabitem home
+            )),
     tabItem(tabName = "slider",
               column(
                 sliderInput("mapsel", label = h3("Slider Range"), min = round(min(map_data$gender_equality_index_18,na.rm = T),2), 
@@ -193,6 +194,7 @@ body <- dashboardBody(
              # end fluidrow
     ), # end tab item 
     tabItem(tabName = "scatterplot",
+            fluidRow(
               box(title = "Scatterplot on Gender Equality outcomes and predictors",
                   status = "primary",
                   solidHeader = TRUE,
@@ -201,18 +203,21 @@ body <- dashboardBody(
                   p("alter this interactive plot to see how it affects outputs"),
                   selectInput(inputId = "xCol", label = "X", choices = c("HDI Rank"),
                               selected = "HDI Rank"),
-                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank ’18", "Maternal Mortality Ratio ’15",
-                                                                         "Adolescent Birth Rate ’15-’20", "Seats in Parliment ’18"),
-                              multiple = TRUE, selected = "HDI Rank")), # end box 1 scatter
-            box(plotOutput("plot1",
-                       click = "plot_click",
-                       dblclick = "plot_dblclick",
-                       hover = "plot_hover",
-                       brush = "plot_brush",
-                       inline = FALSE
+                  selectInput(inputId = 'yCol', label = "Y", choices = c("HDI Rank", "Rank '18", "Maternal Mortality Ratio '15", 
+                                                                         "Adolescent Birth Rate '15-'20", "Seats in Parliment '18"), multiple = TRUE,
+                
+                              selected = "HDI Rank")), # box 1 scatterplot
+              box(plotOutput("plot1",
+                             click = "plot_click",
+                             dblclick = "plot_dblclick",
+                             hover = "plot_hover",
+                             brush = "plot_brush",
+                             inline = FALSE
+            ) # box 2 scatterplot
+            
             ),
-            verbatimTextOutput("info")) # end box 2 scatter 
-    ), # end scatter plot tab
+            verbatimTextOutput("info") 
+    ), # end scatter plot),
     tabItem(tabName = "involved",
             fluidRow(
               box(title = "Get Informed & Involved",
@@ -253,7 +258,7 @@ body <- dashboardBody(
             ) # end tabName self_model
     
   ) # end tabItems
- )# end dashboardBody
+) # end dashboardBody
 
 ### Choose theme 
 app_theme <- bs_theme(
@@ -268,14 +273,20 @@ ui <- dashboardPage(header, sidebar, body, skin = "blue")
 
 
 
-
-
-
 ### create server function:
 server <- function(input, output) {
   ### start server function
   
-  # INTERACTIVE MAP
+  ## function for data table
+  output$table <- renderDataTable({ 
+    tab_data_table %>% 
+      filter(Country == input$incountry) 
+    # observe({
+    #   print(input$incountry)
+    # })
+  })
+  
+# function for interactive map
   ######first creating palette by ge index
   pal <- colorBin(
     palette = "viridis", domain = map_merged$gender_equality_index_18,
@@ -297,7 +308,7 @@ server <- function(input, output) {
     map_merged$seats_in_parliment_18, "<br/> "
   ) %>%
     lapply(htmltools::HTML)
-  ## output of joemap interactive 
+## output of joemap interactive 
   output$joemap <- renderLeaflet({
     leaflet(map_merged) %>%
       addTiles() %>%
@@ -317,28 +328,32 @@ server <- function(input, output) {
         opacity = 0.7, title = "Gender Equality Index",
         position = "bottomleft"
       ) #%>% 
-    # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
-    #   addScaleBar(position = "bottomleft") 
+      # leaflet(options = leafletOptions(attributionControl = FALSE))%>% 
+      #   addScaleBar(position = "bottomleft") 
   })
   
-  ## REACTIVE DATA TABLE
-  output$table <- renderDataTable({ 
-    tab_data_table %>% 
-      filter(Country == input$incountry) 
-    # observe({
-    #   print(input$incountry)
-    # })
-  })
-  
-
   #### Scatter Plot ### 
   df2 <- reactive({gender_mod[, c(input$xCol, input$yCol)]})
   
-  output$plot1 <- renderPlot({
-    plot(df2(), pch = 20, cex = 3, col = "blue",
-         main = "Interactive Scatter Plot")
+ 
+  # Create the plot
+  # output$plot1 <- renderPlot({plot(df2(), pch = 20, cex = 3, col = "blue",
+  #                                 main = "Interactive Scatter Plot")})
+  # 
+output$plot1 <- renderPlot({
+  plot1_df <- ggplot(df2[df2$], aes(x = year, y = Concede_and_Divide_Revenue, color = HmTm)) + 
+  geom_point() + xlab("Year") + ylab("Concede-and-Divide Allocation") + 
+  ggtitle("Concede-and-Divide Rule Allocation 1998-2019") + 
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+  
+})
+  
   })
   
+  # output$plot1 <- renderPlot({
+  #   plot(gender_mod$`Rank '18`, gender_mod$`HDI Rank`)
+  # })
+  # 
   # output$info <- renderText({
   #   xy_str <- function(e) {
   #     if(is.null(e)) return("NULL\n")
@@ -346,10 +361,10 @@ server <- function(input, output) {
   #   }
   #   xy_range_str <- function(e) {
   #     if(is.null(e)) return("NULL\n")
-  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1), 
+  #     paste0(xmin=2, round(e$xmin, 1), xmax= 2, round(e$xmax, 1),
   #             ymin=4, round(e$ymin, 1),  ymax= 4, round(e$ymax, 1))
   #   }
-  #   
+  # 
   #   paste0(
   #     "click: ", xy_str(input$plot_click),
   #     "dblclick: ", xy_str(input$plot_dblclick),
